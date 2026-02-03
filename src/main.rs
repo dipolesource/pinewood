@@ -5,15 +5,25 @@ mod db;
 
 use std::sync::{Arc, Mutex};
 use sqlx::SqlitePool;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
 struct AppState {
     db: Arc<Mutex<Option<SqlitePool>>>,
 }
 
 #[tauri::command]
-async fn init_database(state: State<'_, AppState>) -> Result<String, String> {
-    let pool = db::init_db("pinewood.db")
+async fn init_database(app: AppHandle, state: State<'_, AppState>) -> Result<String, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    std::fs::create_dir_all(&app_data_dir)
+        .map_err(|e| format!("Failed to create app data directory: {}", e))?;
+
+    let db_path = app_data_dir.join("pinewood.db");
+
+    let pool = db::init_db(db_path.to_str().ok_or("Invalid database path")?)
         .await
         .map_err(|e| format!("Failed to initialize database: {}", e))?;
 

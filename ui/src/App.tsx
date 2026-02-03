@@ -14,6 +14,19 @@ interface Scout {
 
 const DENS = ['Tiger', 'Wolf', 'Bear', 'Webelos', 'Arrow of Light'];
 
+// Check if running in Tauri context
+function isTauriContext(): boolean {
+  return !!(window as any).__TAURI_INTERNALS__;
+}
+
+// Safe invoke wrapper
+async function safeInvoke<T>(cmd: string, args?: any): Promise<T> {
+  if (!isTauriContext()) {
+    throw new Error('Tauri API not available - app must run in Tauri context');
+  }
+  return invoke<T>(cmd, args);
+}
+
 function App() {
   const [scouts, setScouts] = useState<Scout[]>([]);
   const [name, setName] = useState('');
@@ -30,8 +43,13 @@ function App() {
   }, []);
 
   async function initializeDatabase() {
+    if (!isTauriContext()) {
+      console.warn('Running in browser mode - Tauri features disabled');
+      return;
+    }
+
     try {
-      await invoke('init_database');
+      await safeInvoke('init_database');
     } catch (err) {
       console.error('Failed to initialize database:', err);
       setError(String(err));
@@ -39,8 +57,10 @@ function App() {
   }
 
   async function loadScouts() {
+    if (!isTauriContext()) return;
+
     try {
-      const result = await invoke<Scout[]>('get_checked_in_scouts');
+      const result = await safeInvoke<Scout[]>('get_checked_in_scouts');
       setScouts(result);
     } catch (err) {
       console.error('Failed to load scouts:', err);
@@ -48,8 +68,10 @@ function App() {
   }
 
   async function loadNextCarNumber() {
+    if (!isTauriContext()) return;
+
     try {
-      const nextNum = await invoke<number>('get_next_car_number');
+      const nextNum = await safeInvoke<number>('get_next_car_number');
       setCarNumber(nextNum);
     } catch (err) {
       console.error('Failed to get next car number:', err);
@@ -59,6 +81,11 @@ function App() {
   async function handleCheckin(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!isTauriContext()) {
+      setError('App must run in Tauri context to check in scouts');
+      return;
+    }
 
     // Validation
     if (!name.trim()) {
@@ -79,7 +106,7 @@ function App() {
     setLoading(true);
 
     try {
-      const newScout = await invoke<Scout>('checkin_scout', {
+      const newScout = await safeInvoke<Scout>('checkin_scout', {
         name: name.trim(),
         den,
         carNumber,

@@ -3,7 +3,7 @@
   "identifier": "com.pinewood.derby",
   "version": "0.1.0",
   "build": {
-    "frontendDist": "../ui/dist",
+    "frontendDist": "ui/dist",
     "devUrl": "http://localhost:5173"
   },
   "app": {
