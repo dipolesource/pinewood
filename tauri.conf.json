@@ -1,0 +1,26 @@
+{
+  "productName": "Pinewood Derby",
+  "identifier": "com.pinewood.derby",
+  "version": "0.1.0",
+  "build": {
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:5173"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Pinewood Derby Race Manager",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false
+  }
+}
