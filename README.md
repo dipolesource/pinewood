@@ -85,6 +85,24 @@ npm run build
 cargo build --release
 ```
 
+### Testing
+
+Frontend testing with Playwright:
+
+```bash
+cd ui
+npm test              # Run all tests headless
+npm run test:ui       # Run with UI mode
+npm run test:headed   # Run with browser visible
+```
+
+**Test Coverage:**
+- 16 tests covering check-in UI functionality
+- Form validation (weight limits, required fields)
+- Scout list display and management
+- Error handling and warnings
+- Browser vs Tauri context handling
+
 ## Features Implemented (Phase 1)
 
 ### Database Schema
@@ -135,8 +153,11 @@ See `../../MVP_PLANNING.md` for full roadmap:
 
 - ✅ Zero warnings in Rust build
 - ✅ Frontend bundled with Vite
-- ✅ SQLite database created on first run (`pinewood.db`)
+- ✅ SQLite database created on first run in app data directory
+  - macOS: `~/Library/Application Support/com.pinewood.derby/pinewood.db`
+  - Windows: `%APPDATA%/com.pinewood.derby/pinewood.db`
 - ✅ All validations working client-side and server-side
+- ✅ Playwright test suite with 16 tests (all passing)
 
 ## License
 
